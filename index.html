@@ -1,0 +1,653 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panel COSMO</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gabarito:wght@500;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FBF6F6; --surface:#FFFFFF; --surface-2:#FFF0F0; --surface-3:#F6F1FB;
+  --ink:#2B0E28; --ink-muted:rgba(43,14,40,.66); --ink-faint:rgba(43,14,40,.46);
+  --border:rgba(54,17,51,.11); --border-strong:rgba(54,17,51,.2);
+  --brand:#EF2222; --brand-ink:#B01515; --violet:#534DFF; --violet-ink:#3E39C4; --gold:#B8860B; --gold-bg:#FDF3D6;
+  --good:#1F9D55; --good-bg:#E3F5EA; --bad:#EF2222; --bad-bg:#FDE7E7;
+  --font-head:'Gabarito',system-ui,sans-serif; --font-body:'Plus Jakarta Sans',system-ui,sans-serif;
+  --shadow:0 4px 20px rgba(54,17,51,.06); --shadow-lg:0 16px 44px rgba(54,17,51,.14);
+  --radius:14px; --radius-lg:20px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#1B0A1A; --surface:#271224; --surface-2:#33162E; --surface-3:#241A38;
+    --ink:#FBF4FA; --ink-muted:rgba(251,244,250,.72); --ink-faint:rgba(251,244,250,.5);
+    --border:rgba(255,255,255,.1); --border-strong:rgba(255,255,255,.18);
+    --brand:#FF5B5B; --brand-ink:#FF8383; --violet:#8B85FF; --violet-ink:#ADA8FF; --gold:#F8D53C; --gold-bg:rgba(248,213,60,.14);
+    --good:#3ECB84; --good-bg:rgba(62,203,132,.15); --bad:#FF5B5B; --bad-bg:rgba(255,91,91,.14);
+    --shadow:0 4px 20px rgba(0,0,0,.35); --shadow-lg:0 20px 50px rgba(0,0,0,.5);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#1B0A1A; --surface:#271224; --surface-2:#33162E; --surface-3:#241A38;
+  --ink:#FBF4FA; --ink-muted:rgba(251,244,250,.72); --ink-faint:rgba(251,244,250,.5);
+  --border:rgba(255,255,255,.1); --border-strong:rgba(255,255,255,.18);
+  --brand:#FF5B5B; --brand-ink:#FF8383; --violet:#8B85FF; --violet-ink:#ADA8FF; --gold:#F8D53C; --gold-bg:rgba(248,213,60,.14);
+  --good:#3ECB84; --good-bg:rgba(62,203,132,.15); --bad:#FF5B5B; --bad-bg:rgba(255,91,91,.14);
+  --shadow:0 4px 20px rgba(0,0,0,.35); --shadow-lg:0 20px 50px rgba(0,0,0,.5);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--font-body);line-height:1.5;-webkit-font-smoothing:antialiased;font-size:15px}
+h1,h2,h3,h4{font-family:var(--font-head);line-height:1.15;text-wrap:balance}
+table{font-variant-numeric:tabular-nums}
+.num{font-variant-numeric:tabular-nums}
+a{color:var(--violet-ink)}
+::selection{background:var(--brand);color:#fff}
+.shell{max-width:1280px;margin:0 auto;padding:0 24px 80px}
+
+/* ---------- TOPBAR ---------- */
+.topbar{position:sticky;top:0;z-index:50;background:var(--surface);border-bottom:1px solid var(--border);backdrop-filter:blur(10px)}
+.topbar-in{max-width:1280px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.brand-mark{display:flex;align-items:center;gap:10px}
+.brand-mark img{height:20px}
+.brand-mark .sep{width:1px;height:22px;background:var(--border-strong)}
+.brand-mark .proj{font-family:var(--font-head);font-weight:800;font-size:16px;letter-spacing:-.01em}
+.topbar-spacer{flex:1}
+.freshness{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.chip{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:6px 12px;border-radius:99px;border:1px solid var(--border-strong);color:var(--ink-muted);background:var(--surface)}
+.chip .dot{width:7px;height:7px;border-radius:50%}
+.chip.live .dot{background:var(--good);box-shadow:0 0 0 3px var(--good-bg)}
+.chip.stale .dot{background:var(--gold);box-shadow:0 0 0 3px var(--gold-bg)}
+
+/* ---------- HEADER / MASTHEAD ---------- */
+.masthead{padding:36px 0 8px}
+.masthead .eyebrow{font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--brand-ink);margin-bottom:10px}
+.masthead h1{font-size:clamp(26px,3.4vw,38px);font-weight:800;letter-spacing:-.01em;max-width:24ch}
+.masthead .sub{color:var(--ink-muted);margin-top:10px;max-width:66ch;font-size:15.5px}
+.source-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}
+.source-pill{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;padding:7px 13px;border-radius:99px;background:var(--surface-2);color:var(--ink);text-decoration:none;border:1px solid var(--border)}
+.source-pill:hover{border-color:var(--border-strong)}
+.source-pill b{font-weight:800}
+
+/* ---------- KPI HERO ---------- */
+.kpi-row{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:28px}
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px 24px 22px;box-shadow:var(--shadow);position:relative}
+.kpi .tag{font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-faint)}
+.kpi .tag.hard{color:var(--brand-ink)}
+.kpi-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.kpi .status{font-size:11px;font-weight:800;letter-spacing:.04em;padding:4px 10px;border-radius:99px}
+.status.good{background:var(--good-bg);color:var(--good)}
+.status.warn{background:var(--gold-bg);color:var(--gold)}
+.status.bad{background:var(--bad-bg);color:var(--bad)}
+.kpi .n{font-family:var(--font-head);font-size:44px;font-weight:800;letter-spacing:-.02em;margin-top:14px}
+.kpi .n small{font-size:16px;font-weight:700;color:var(--ink-faint);margin-left:4px}
+.kpi .compare{font-size:13.5px;color:var(--ink-muted);margin-top:8px}
+.kpi .compare b{color:var(--ink)}
+.kpi .barwrap{margin-top:14px;height:7px;border-radius:99px;background:var(--surface-3);overflow:hidden}
+.kpi .barfill{height:100%;border-radius:99px}
+
+/* ---------- SECTION SCAFFOLD ---------- */
+.section{margin-top:52px}
+.section-head{display:flex;justify-content:space-between;align-items:baseline;gap:16px;flex-wrap:wrap;margin-bottom:6px}
+.section-head h2{font-size:21px;font-weight:800}
+.section-head .meta{font-size:12.5px;color:var(--ink-faint);font-weight:600}
+.section-desc{color:var(--ink-muted);font-size:14px;max-width:74ch;margin-top:4px;margin-bottom:20px}
+
+/* ---------- ALERTS BOARD ---------- */
+.lanes{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.lane-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.lane-title{display:flex;align-items:center;gap:9px;font-family:var(--font-head);font-weight:800;font-size:15.5px}
+.lane-title .sw{width:11px;height:11px;border-radius:3px}
+.lane-count{font-size:11.5px;font-weight:700;color:var(--ink-faint);background:var(--surface-3);padding:3px 10px;border-radius:99px}
+.lane-owner{font-size:12px;color:var(--ink-faint);margin-bottom:14px}
+.alert{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;margin-bottom:12px;position:relative;padding-left:20px}
+.alert:before{content:"";position:absolute;left:0;top:12px;bottom:12px;width:4px;border-radius:3px}
+.alert.sev-critica:before{background:var(--bad)}
+.alert.sev-alta:before{background:var(--gold)}
+.alert.sev-media:before{background:var(--violet)}
+.alert-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.sev-chip{font-size:10.5px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;padding:3px 9px;border-radius:6px;white-space:nowrap}
+.sev-chip.sev-critica{background:var(--bad-bg);color:var(--bad)}
+.sev-chip.sev-alta{background:var(--gold-bg);color:var(--gold)}
+.sev-chip.sev-media{background:rgba(83,77,255,.12);color:var(--violet-ink)}
+.alert h4{font-size:14.5px;font-weight:700;margin-top:9px}
+.alert p{font-size:13.3px;color:var(--ink-muted);margin-top:5px}
+.alert .action{font-size:13px;margin-top:9px;padding-top:9px;border-top:1px dashed var(--border);color:var(--ink)}
+.alert .action b{font-weight:800}
+.alert .owner-row{display:flex;justify-content:space-between;align-items:center;margin-top:10px}
+.owner-tag{font-size:10.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:3px 10px;border-radius:99px;background:var(--surface-3);color:var(--ink-muted)}
+.metric-badge{font-family:var(--font-head);font-weight:800;font-size:13px;color:var(--ink-faint)}
+
+/* ---------- FUNNEL ---------- */
+.funnel{display:flex;flex-direction:column;gap:10px;margin-top:6px}
+.fr{display:grid;grid-template-columns:172px 1fr 108px 64px;gap:16px;align-items:center}
+.fr .lbl{font-weight:700;font-size:13.5px}
+.fr .lbl small{display:block;font-weight:500;color:var(--ink-faint);font-size:11px;margin-top:1px}
+.fr .track{background:var(--surface-3);border-radius:8px;height:34px;position:relative;overflow:hidden}
+.fr .meta-mark{position:absolute;top:0;bottom:0;width:2px;background:var(--ink-faint);z-index:2}
+.fr .real-bar{position:absolute;left:0;top:0;bottom:0;border-radius:8px;background:linear-gradient(90deg,var(--brand),var(--violet));display:flex;align-items:center;padding-left:12px;color:#fff;font-weight:700;font-size:12.5px;transition:width 1s cubic-bezier(.2,.8,.2,1)}
+.fr.win .real-bar{background:linear-gradient(90deg,var(--good),#3ec97f)}
+.fr .figures{font-size:12.5px;color:var(--ink-muted);text-align:right}
+.fr .figures b{color:var(--ink);font-weight:700}
+.fr .pillpc{text-align:right}
+.legend{display:flex;gap:20px;margin-top:16px;font-size:12.5px;color:var(--ink-muted);flex-wrap:wrap}
+.legend span{display:flex;align-items:center;gap:7px}
+.legend i{display:inline-block;width:14px;height:10px;border-radius:3px}
+
+/* ---------- TABLES ---------- */
+.tablewrap{overflow-x:auto;border-radius:var(--radius-lg);border:1px solid var(--border);box-shadow:var(--shadow)}
+table{width:100%;border-collapse:collapse;background:var(--surface);font-size:13.5px;min-width:640px}
+th{background:var(--surface-3);text-align:left;padding:12px 16px;font-family:var(--font-head);font-size:11px;letter-spacing:.06em;text-transform:uppercase;font-weight:700;color:var(--ink-muted);white-space:nowrap}
+td{padding:11px 16px;border-bottom:1px solid var(--border);white-space:nowrap}
+tbody tr:last-child td{border-bottom:none}
+tbody tr.hi{background:var(--surface-2)}
+tbody tr.lo{background:var(--gold-bg)}
+td.al-r,th.al-r{text-align:right}
+.rank{font-weight:800;color:var(--ink-faint);font-size:12px}
+.pill{display:inline-flex;padding:3px 10px;border-radius:99px;font-size:12px;font-weight:800}
+.pill.good{background:var(--good-bg);color:var(--good)}
+.pill.warn{background:var(--gold-bg);color:var(--gold)}
+.pill.bad{background:var(--bad-bg);color:var(--bad)}
+.mini-bar{display:inline-block;width:70px;height:6px;border-radius:99px;background:var(--surface-3);position:relative;vertical-align:middle;margin-right:8px;overflow:hidden}
+.mini-bar span{position:absolute;left:0;top:0;bottom:0;border-radius:99px;background:var(--violet)}
+
+/* ---------- PAUTA ---------- */
+.pauta-grid{display:grid;grid-template-columns:1.3fr 1fr;gap:20px;align-items:start}
+.cmp-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:22px;box-shadow:var(--shadow)}
+.cmp-row{display:grid;grid-template-columns:70px 1fr 120px;gap:14px;align-items:center;margin-top:16px}
+.cmp-row:first-of-type{margin-top:6px}
+.cmp-row .who{font-weight:800;font-size:13px}
+.cmp-track{height:22px;background:var(--surface-3);border-radius:6px;position:relative;overflow:hidden}
+.cmp-fill{position:absolute;left:0;top:0;bottom:0;border-radius:6px;transition:width 1s cubic-bezier(.2,.8,.2,1)}
+.cmp-fill.g{background:linear-gradient(90deg,#4285F4,#7baaf7)}
+.cmp-fill.m{background:linear-gradient(90deg,var(--violet),#8b85ff)}
+.cmp-figs{text-align:right;font-size:12.5px;color:var(--ink-muted)}
+.cmp-figs b{color:var(--ink)}
+
+/* ---------- ACCIONES / CLICKUP ---------- */
+.actions-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.task-list{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow);overflow:hidden}
+.task{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;padding:13px 18px;border-bottom:1px solid var(--border)}
+.task:last-child{border-bottom:none}
+.task-name{font-size:13.5px;font-weight:600}
+.task-meta{font-size:11.5px;color:var(--ink-faint);margin-top:3px}
+.task-status{font-size:10.5px;font-weight:800;letter-spacing:.03em;text-transform:uppercase;padding:3px 9px;border-radius:6px;white-space:nowrap}
+.task-status.atrasada{background:var(--bad-bg);color:var(--bad)}
+.task-status.enproceso{background:var(--gold-bg);color:var(--gold)}
+.task-status.porhacer{background:var(--surface-3);color:var(--ink-muted)}
+
+/* ---------- FOOTER ---------- */
+footer{margin-top:64px;padding:32px 0 12px;border-top:1px solid var(--border)}
+.foot-grid{display:grid;grid-template-columns:2fr 1fr 1fr;gap:28px}
+footer h5{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-faint);margin-bottom:10px}
+footer p, footer li{font-size:12.5px;color:var(--ink-muted)}
+footer ul{list-style:none}
+footer li{margin-bottom:6px}
+footer li a{color:var(--ink-muted);text-decoration:none}
+footer li a:hover{color:var(--violet-ink)}
+.foot-brand{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.foot-brand img{height:18px}
+.dark-only-invert{filter:none}
+:root:not([data-theme="light"]) .dark-only-invert{filter:brightness(0) invert(1)}
+:root[data-theme="dark"] .dark-only-invert{filter:brightness(0) invert(1)}
+
+@media (max-width:920px){
+  .kpi-row,.lanes,.actions-grid,.pauta-grid,.foot-grid{grid-template-columns:1fr}
+  .fr{grid-template-columns:110px 1fr 74px;gap:8px}
+  .fr .figures{display:none}
+  .shell{padding:0 16px 60px}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+ <div class="topbar-in">
+  <div class="brand-mark">
+   <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTE1IiBoZWlnaHQ9IjMzIiB2aWV3Qm94PSIwIDAgMTE1IDMzIiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8ZyBjbGlwLXBhdGg9InVybCgjY2xpcDBfMTg0MF8yMTI0KSI+CjxwYXRoIGQ9Ik0zNy44NjQzIDMzQzM3LjA5MzYgMzMgMzYuMzIyOSAzMi44NjY0IDM1LjU2NCAzMi41NTJDMzIuNzE0MyAzMS4zNzY5IDMxLjI2NzcgMjguMjM2OSAzMS4yNjc3IDIzLjIzMDFDMzEuMjY3NyAyMC4zNzY5IDMxLjI3NTYgMTcuOTU2MSAzMS4yODM1IDE1LjMzNDhDMzEuMjg3NSAxMy4zNzM3IDMxLjI5MTQgMTEuODU2NyAzMS4yOTE0IDEwLjY1NDJIMzcuNjE1M0MzNy42MTUzIDExLjg2MDcgMzcuNjExNCAxMy4zODE2IDM3LjYwNzQgMTUuMzUwNUMzNy41OTk1IDE3Ljk2NzggMzcuNTkxNiAyMC4zODA5IDM3LjU5MTYgMjMuMjMwMUMzNy41OTE2IDI2LjA3OTMgMzguNjQyOSAyNi45MDg1IDM4LjY0MjkgMjYuOTA4NUM0MC40MDk3IDI2LjQ3NjIgNDEuMjM5NyAyNS4zMzI2IDQyLjE1MjcgMjQuMDEyMUw0Ni42MTEgMjguNDY4N0M0NS40MDk1IDI5LjY2MzUgNDEuNjkwMyAzMyAzNy44NjA0IDMzSDM3Ljg2NDNaIiBmaWxsPSIjRUYyMjIyIi8+CjxwYXRoIGQ9Ik04OC44Mzg5IDMzQzg4LjA2ODEgMzMgODcuMjk3NCAzMi44NjY0IDg2LjUzODUgMzIuNTUyQzgzLjY4ODggMzEuMzc2OSA4Mi4yNDIyIDI4LjIzNjkgODIuMjQyMiAyMy4yMzAxQzgyLjI0MjIgMjAuMzc2OSA4Mi4yNTAyIDE4LjAxODkgODIuMjU4MSAxNS40NTY2QzgyLjI2MiAxMy41Mzg4IDgyLjI2NiAxMS44NTY3IDgyLjI2NiAxMC42NTQySDg4LjU4OTlDODguNTg5OSAxMS44NjA3IDg4LjU4NTkgMTMuNTQ2NiA4OC41ODE5IDE1LjQ3MjNDODguNTc0IDE4LjAzMDcgODguNTY2MSAyMC4zODA5IDg4LjU2NjEgMjMuMjMwMUM4OC41NjYxIDI1LjM3OTggODguODgyMyAyNi4zMzQ4IDg5LjA1MjMgMjYuNjg4NUM4OS45MzM3IDI2LjUxOTUgOTEuODIyOSAyNS4yOTMzIDkzLjEzMTIgMjQuMDA4Mkw5Ny41ODk2IDI4LjQ2NDhDOTYuMzg4IDI5LjY1OTUgOTIuNjY4OCAzMi45OTYxIDg4LjgzODkgMzIuOTk2MVYzM1oiIGZpbGw9IiNFRjIyMjIiLz4KPHBhdGggZD0iTTY3LjEwNDQgMzNDNjMuNzk2MiAzMyA1OC44NzU1IDMwLjU2NzMgNTguODc1NSAyMy44NjY3QzU4Ljg3NTUgMjEuMDEzNiA1OC44ODM0IDE4LjI5MDEgNTguODkxMyAxNS45NTU3QzU4Ljg5NTIgMTQuMjA2OSA1OC44OTkyIDExLjg2MDcgNTguODk5MiAxMC42NTQySDY1LjIyMzFDNjUuMjIzMSAxMS44NjA3IDY1LjIxOTEgMTQuMjE4NyA2NS4yMTUyIDE1Ljk3MTRDNjUuMjA3MyAxOC4zMDE5IDY1LjE5OTQgMjEuMDE3NSA2NS4xOTk0IDIzLjg2NjdDNjUuMTk5NCAyNC41NDY2IDY1LjE5OTQgMjYuNjEzOCA2Ny4xNzU2IDI2LjcxNkg2Ny4xMDQ0VjMzLjAwMzlWMzNaIiBmaWxsPSIjRUYyMjIyIi8+CjxwYXRoIGQ9Ik0zNC4zOTggMEMzNi43Nzc0IDAgMzcuOTkwOCAxLjM5OTA3IDM3Ljk5MDggMy41NzIzNUMzNy45OTA4IDUuODk4ODkgMzYuMzkgNy4xNDQ2OSAzNC4zOTggNy4xNDQ2OUMzMi43MDY0IDcuMTQ0NjkgMzEuMDQ2NCA1LjUzMzQgMzEuMDQ2NCAzLjU3MjM1QzMxLjA0NjQgMS42MTEyOSAzMi4zNzgzIDAgMzQuMzk4IDBaIiBmaWxsPSIjRUYyMjIyIi8+CjxwYXRoIGQ9Ik04NS4yODU2IDBDODcuNjY1IDAgODguODc4NCAxLjM5OTA3IDg4Ljg3ODQgMy41NzIzNUM4OC44Nzg0IDUuODk4ODkgODcuMjc3NiA3LjE0NDY5IDg1LjI4NTYgNy4xNDQ2OUM4My41OTQgNy4xNDQ2OSA4MS45MzQgNS41MzM0IDgxLjkzNCAzLjU3MjM1QzgxLjkzNCAxLjYxMTI5IDgzLjI2NTkgMCA4NS4yODU2IDBaIiBmaWxsPSIjRUYyMjIyIi8+CjxwYXRoIGQ9Ik0yOS42MDc3IDEwLjEwNEMyNy40MTAxIDEwLjEwNCAyNS4yMDQ3IDEwLjc4NzggMjMuMzE5NCAxMi4xMlYxMC42NTAySDE4LjE2OTNWMzIuNDQ5OEgyMy41OTZWMjMuNTU2M0MyMy41OTYgMTcuODMwMyAyNC44NTI5IDE1LjYxMzggMjkuNjA3NyAxNS42MTM4VjEwLjEwNFoiIGZpbGw9IiNFRjIyMjIiLz4KPHBhdGggZD0iTTgwLjU4MjIgMTAuMTA0Qzc4LjM4NDcgMTAuMTA0IDc2LjE3OTIgMTAuNzg3OCA3NC4yOTM5IDEyLjEyVjEwLjY1MDJINjkuMTQzOVYzMi40NDk4SDc0LjU3MDVWMjMuNTU2M0M3NC41NzA1IDE3LjgzMDMgNzUuODI3NCAxNS42MTM4IDgwLjU4MjIgMTUuNjEzOFYxMC4xMDRaIiBmaWxsPSIjRUYyMjIyIi8+CjxwYXRoIGQ9Ik0xMi43ODYxIDIzLjE1MTVWMTUuNDM2OUMxMi43ODYxIDEyLjEyIDEzLjk0MDIgMTAuNjU0MiAxNi40NjU4IDEwLjY1NDJMMTYuNTAxNCA0Ljg4ODg5SDEyLjYyMDFDMTIuNjIwMSA0Ljg4ODg5IDEzLjUzNzEgMS41MDUxOCAxMy41MzcxIDBINy4zMTJDNy4xNzc2MiAzLjQ2NjI0IDYuMjg0MzcgOS4zMTQwNCAwIDEwLjY0NjNMMS4yNTI5MiAxNi41MTM4QzMuMzYzNTIgMTYuMDY1NyA1LjEwMjU5IDE1LjMzODcgNi41MzczMyAxNC40NDY2VjIzLjUyNDhDNi41MzczMyAyOS41MDIzIDEwLjMyMzggMzMuMDAzOSAxNS45OTE1IDMzLjAwMzlWMjcuMDg1NEMxMy42NzU0IDI3LjA4NTQgMTIuNzgyMiAyNi4yMjA4IDEyLjc4MjIgMjMuMTU1NEwxMi43ODYxIDIzLjE1MTVaIiBmaWxsPSJ1cmwoI3BhaW50MF9saW5lYXJfMTg0MF8yMTI0KSIvPgo8cGF0aCBkPSJNNTMuMDkzIDEwLjEwNEM1OS44Njc1IDEwLjEwNCA2NC43ODQzIDE0Ljc3MjggNjQuNzg0MyAyMS41NTJDNjQuNzg0MyAyOC4zMzEyIDU5Ljg2NzUgMzMgNTMuMDkzIDMzQzQ2LjMxODYgMzMgNDEuNDAxNyAyOC4zMzEyIDQxLjQwMTcgMjEuNTUyQzQxLjQwMTcgMTQuNzcyOCA0Ni4zMTg2IDEwLjEwNCA1My4wOTMgMTAuMTA0Wk01My4wOTMgMjcuNjcxQzU2LjUxNTggMjcuNjcxIDU4Ljg3OTQgMjUuMTk5IDU4Ljg3OTQgMjEuNTU1OUM1OC44Nzk0IDE3LjkxMjggNTYuNTE1OCAxNS40NDA5IDUzLjA5MyAxNS40NDA5QzQ5LjY3MDIgMTUuNDQwOSA0Ny4zMDY3IDE3LjkxMjggNDcuMzA2NyAyMS41NTU5QzQ3LjMwNjcgMjUuMTk5IDQ5LjY3MDIgMjcuNjcxIDUzLjA5MyAyNy42NzFaIiBmaWxsPSIjRUYyMjIyIi8+CjxwYXRoIGQ9Ik0xMDMuMzA5IDEwLjEwNEMxMTAuMDgzIDEwLjEwNCAxMTQuOTk2IDE0Ljc3MjggMTE0Ljk5NiAyMS41NTJDMTE0Ljk5NiAyOC4zMzEyIDExMC4wODMgMzMgMTAzLjMwOSAzM0M5Ni41MzQyIDMzIDkxLjYyMTQgMjguMzMxMiA5MS42MjE0IDIxLjU1MkM5MS42MjE0IDE0Ljc3MjggOTYuNTM0MiAxMC4xMDQgMTAzLjMwOSAxMC4xMDRaTTEwMy4zMDkgMjcuNjcxQzEwNi43MzIgMjcuNjcxIDEwOS4wOTEgMjUuMTk5IDEwOS4wOTEgMjEuNTU1OUMxMDkuMDkxIDE3LjkxMjggMTA2LjcyOCAxNS40NDA5IDEwMy4zMDkgMTUuNDQwOUM5OS44ODk5IDE1LjQ0MDkgOTcuNTI2MyAxNy45MTI4IDk3LjUyNjMgMjEuNTU1OUM5Ny41MjYzIDI1LjE5OSA5OS44ODk5IDI3LjY3MSAxMDMuMzA5IDI3LjY3MVoiIGZpbGw9IiNFRjIyMjIiLz4KPHBhdGggZD0iTTEzLjUzNzEgMEg3LjMxMkM3LjE3NzYyIDMuNDY2MjQgNi4yODQzNyA5LjMxNDA0IDAgMTAuNjQ2M0wxLjI1MjkyIDE2LjUxMzhDMy4zNjM1MiAxNi4wNjU3IDUuMTAyNTkgMTUuMzM4NyA2LjUzNzMyIDE0LjQ0NjZDNi41MzczMiAxNC40NDY2IDEzLjUzMzEgMTAuMjE3OSAxMy41MjUyIDEuOTg4NTdDMTMuNTI1MiAxLjk4ODU3IDEzLjUzMzEgMS41MTMwNCAxMy41MzMxIDAuMDAzOTI5OTdMMTMuNTM3MSAwWiIgZmlsbD0iI0VGMjIyMiIvPgo8L2c+CjxkZWZzPgo8bGluZWFyR3JhZGllbnQgaWQ9InBhaW50MF9saW5lYXJfMTg0MF8yMTI0IiB4MT0iMTMuNjM1OSIgeTE9IjE0LjM0NDQiIHgyPSItMy4zMTk1OCIgeTI9Ii0yLjU5ODMyIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+CjxzdG9wIHN0b3AtY29sb3I9IiNFRjIyMjIiLz4KPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMzYxMTMzIi8+CjwvbGluZWFyR3JhZGllbnQ+CjxjbGlwUGF0aCBpZD0iY2xpcDBfMTg0MF8yMTI0Ij4KPHJlY3Qgd2lkdGg9IjExNSIgaGVpZ2h0PSIzMyIgZmlsbD0id2hpdGUiLz4KPC9jbGlwUGF0aD4KPC9kZWZzPgo8L3N2Zz4K" alt="Triario">
+   <div class="sep"></div>
+   <div class="proj">COSMO Schools</div>
+  </div>
+  <div class="topbar-spacer"></div>
+  <div class="freshness">
+   <span class="chip live"><span class="dot"></span>OKR SharePoint · 25 ago</span>
+   <span class="chip live"><span class="dot"></span>HubSpot · 25 ago</span>
+   <span class="chip stale"><span class="dot"></span>ClickUp · 25 ago</span>
+  </div>
+ </div>
+</div>
+
+<div class="shell">
+
+ <!-- MASTHEAD -->
+ <div class="masthead">
+  <div class="eyebrow">Panel de control · Captación → Matrícula</div>
+  <h1>Inscripciones y conversión a matrícula, en un solo lugar</h1>
+  <p class="sub">Cruza el OKR 2026, el pipeline vivo de HubSpot y el plan de trabajo de ClickUp para vigilar los dos KPI duros del contrato — volumen de inscripciones y tasa de conversión inscripción→matrícula — y avisa a quién le toca actuar cuando algo se sale de rango.</p>
+  <div class="source-row">
+   <a class="source-pill" href="https://triario1-my.sharepoint.com/:x:/r/personal/maria_hernandez_triario_com/_layouts/15/Doc.aspx?sourcedoc=%7BEC768B31-4686-4AEF-A1FF-DC20D82EFBD7%7D&file=COSMO%20-%20OKR%202026%20(ago2026).xlsx" target="_blank" rel="noopener">📊 <b>OKR 2026.xlsx</b> — SharePoint</a>
+   <a class="source-pill" href="https://app.hubspot.com/reports-dashboard/23912833/view/19814122" target="_blank" rel="noopener">📈 <b>TRI · INBOUND 2026</b> — HubSpot</a>
+   <a class="source-pill" href="https://app.hubspot.com/ads/23912833/" target="_blank" rel="noopener">🎯 <b>Ads</b> — HubSpot</a>
+   <a class="source-pill" href="https://app.clickup.com/3025127/v/li/901712322104" target="_blank" rel="noopener">✅ <b>COSMO</b> — ClickUp</a>
+  </div>
+ </div>
+
+ <!-- KPI HERO -->
+ <div class="kpi-row">
+  <div class="kpi">
+   <div class="kpi-head"><span class="tag hard">KPI duro · volumen</span><span class="status warn">92% de meta</span></div>
+   <div class="n">4.753<small>/ 5.169</small></div>
+   <div class="compare">Inscripciones en vivo (HubSpot) vs. meta OKR abr–ago. <b>416 inscripciones</b> por debajo del objetivo del período.</div>
+   <div class="barwrap"><div class="barfill" style="width:92%;background:var(--gold)"></div></div>
+  </div>
+  <div class="kpi">
+   <div class="kpi-head"><span class="tag hard">KPI duro · conversión</span><span class="status bad">64% del diseño</span></div>
+   <div class="n">8,2<small>% real</small></div>
+   <div class="compare">Tasa inscripción→matrícula real (HubSpot) vs. <b>12,7%</b> objetivo (encadenando las 5 tasas del OKR). Es el número que más pesa: cada punto vale ~47 matrículas.</div>
+   <div class="barwrap"><div class="barfill" style="width:64%;background:var(--brand)"></div></div>
+  </div>
+  <div class="kpi">
+   <div class="kpi-head"><span class="tag">Pago de matrículas</span><span class="status bad">60% de meta</span></div>
+   <div class="n">389<small>/ 645</small></div>
+   <div class="compare">Pago de matrícula en vivo (HubSpot), etapa final tras Facturados (694). Faltan <b>256 matrículas</b> para el objetivo del período.</div>
+   <div class="barwrap"><div class="barfill" style="width:60%;background:var(--brand)"></div></div>
+  </div>
+ </div>
+
+ <!-- ALERTAS -->
+ <div class="section">
+  <div class="section-head"><h2>🔔 Alertas activas</h2><span class="meta">12 abiertas · 4 críticas</span></div>
+  <p class="section-desc">Cada alerta nace de comparar meta vs. real en el OKR, el pipeline vivo de HubSpot o las tareas de ClickUp. Se agrupan por a quién le corresponde resolverla: la conversión después de inscripción es gestión comercial/académica de COSMO; la generación y calidad de la demanda (pauta y orgánico) es Triario.</p>
+
+  <div class="lanes">
+   <div>
+    <div class="lane-head">
+     <div class="lane-title"><span class="sw" style="background:var(--violet)"></span>Embudo de conversión</div>
+     <span class="lane-count">5 alertas</span>
+    </div>
+    <div class="lane-owner">Responsable de la acción: equipo comercial / académico COSMO</div>
+
+    <div class="alert sev-critica">
+     <div class="alert-top"><span class="sev-chip sev-critica">Crítica</span><span class="metric-badge">índice 0,72</span></div>
+     <h4>Admitidos → Pago de matrícula: 38% vs. 53% de meta</h4>
+     <p>1.022 admitidos llegaron a 694 facturados y solo 389 pagos de matrícula; a la tasa objetivo habrían sido ~541. Sigue siendo la fuga que más matrículas cuesta.</p>
+     <div class="action">👉 <b>Acción:</b> diagnóstico del proceso entre carta de admisión, facturación y pago — tiempos de respuesta, opciones de financiación y guion de seguimiento por sede.</div>
+     <div class="owner-row"><span class="owner-tag">Comercial COSMO</span></div>
+    </div>
+
+    <div class="alert sev-critica">
+     <div class="alert-top"><span class="sev-chip sev-critica">Crítica</span><span class="metric-badge">índice 0,72</span></div>
+     <h4>Inscripciones → Cupos preasignados: 47% vs. 65% de meta</h4>
+     <p>Con datos en vivo de HubSpot, esta fuga pesa tanto como la de matrícula: 4.753 inscripciones dejaron solo 2.220 cupos preasignados, 715 menos de lo esperado. Sube de severidad frente al corte anterior.</p>
+     <div class="action">👉 <b>Acción:</b> SLA de respuesta a un inscrito nuevo (objetivo &lt;48h) y revisión semanal de inscritos sin cupo asignado.</div>
+     <div class="owner-row"><span class="owner-tag">Comercial COSMO</span></div>
+    </div>
+
+    <div class="alert sev-alta">
+     <div class="alert-top"><span class="sev-chip sev-alta">Alta</span><span class="metric-badge">índice 0,83</span></div>
+     <h4>Asistencia → Admitidos: 70% vs. 84% de meta</h4>
+     <p>De 1.467 familias que asistieron a inmersión, solo 1.022 fueron admitidas — 211 menos de lo esperado a la tasa objetivo.</p>
+     <div class="action">👉 <b>Acción:</b> confirmar si el criterio de admisión se endureció o hay cupo limitado por grado; si es así, reflejarlo en la meta en vez de en el resultado.</div>
+     <div class="owner-row"><span class="owner-tag">Académico COSMO</span></div>
+    </div>
+
+    <div class="alert sev-alta">
+     <div class="alert-top"><span class="sev-chip sev-alta">Alta</span><span class="metric-badge">Centro · Llanogrande</span></div>
+     <h4>Dos sedes convierten muy por debajo del resto</h4>
+     <p>Centro: 276 cupos preasignados y solo 28 matrículas pagadas (10%). Llanogrande convierte 7,5% (bajo volumen, pero igual de bajo). El resto de la red está entre 15% y 24%.</p>
+     <div class="action">👉 <b>Acción:</b> revisar en sitio el seguimiento comercial de Centro esta semana; validar si Llanogrande necesita un guion distinto por ser sede nueva/pequeña.</div>
+     <div class="owner-row"><span class="owner-tag">Comercial COSMO</span></div>
+    </div>
+
+    <div class="alert sev-media">
+     <div class="alert-top"><span class="sev-chip sev-media">Media</span><span class="metric-badge">694 → 389</span></div>
+     <h4>Facturados → Pago efectivo: se pierden 305 en el último paso</h4>
+     <p>De cada 100 negocios facturados, solo 56 terminan en pago registrado. Es una etapa que no existía como tal en el OKR y que el panel de HubSpot revela como quiebre propio.</p>
+     <div class="action">👉 <b>Acción:</b> confirmar con financiera de COSMO si es demora de cartera, desistimiento post-factura o brecha de registro en HubSpot.</div>
+     <div class="owner-row"><span class="owner-tag">Comercial / Financiera COSMO</span></div>
+    </div>
+   </div>
+
+   <div>
+    <div class="lane-head">
+     <div class="lane-title"><span class="sw" style="background:var(--brand)"></span>Pauta y orgánico</div>
+     <span class="lane-count">7 alertas</span>
+    </div>
+    <div class="lane-owner">Responsable de la acción: Triario (paid media / growth)</div>
+
+    <div class="alert sev-critica">
+     <div class="alert-top"><span class="sev-chip sev-critica">Crítica</span><span class="metric-badge">10% de meta</span></div>
+     <h4>Google Ads casi no está generando leads: 185 de 1.891 esperados</h4>
+     <p>Meta triplica su meta de leads calientes (1.732 vs. 810, 214%) mientras Google entrega apenas 10% de la suya. La demanda total se sostiene solo gracias a Meta.</p>
+     <div class="action">👉 <b>En ejecución:</b> auditoría de la estructura de Google (tarea abierta en ClickUp) y reasignación de presupuesto hacia Meta. Confirmar cierre esta semana.</div>
+     <div class="owner-row"><span class="owner-tag">Triario · Paid Media</span></div>
+    </div>
+
+    <div class="alert sev-critica">
+     <div class="alert-top"><span class="sev-chip sev-critica">Crítica</span><span class="metric-badge">HubSpot Ads</span></div>
+     <h4>Error de tracking en la campaña con mejor CTR del mes</h4>
+     <p>"Tri - Tráfico - Publicaciones destacadas" tiene el CTR más alto (6,3% vs. 0,7–1,6% del resto) pero HubSpot reporta 0 contactos por error de seguimiento — de 4 errores activos en la cuenta este mes, este es visible en la campaña encendida.</p>
+     <div class="action">👉 <b>Acción:</b> revisar el evento de conversión / píxel de esta campaña en Ads → Ver errores antes de tomar decisiones de presupuesto con datos incompletos.</div>
+     <div class="owner-row"><span class="owner-tag">Triario · Paid Media</span></div>
+    </div>
+
+    <div class="alert sev-alta">
+     <div class="alert-top"><span class="sev-chip sev-alta">Alta</span><span class="metric-badge">índice 0,76</span></div>
+     <h4>LEADs → Inscripciones: 36% vs. 48% de meta</h4>
+     <p>Es la única fuga del tramo Triario y, con 18% de sobrecumplimiento en volumen de leads, el foco pasa de generar más a generar mejor.</p>
+     <div class="action">👉 <b>En ejecución:</b> afinar segmentación y calificación de leads; priorizar ganchos concretos (cupo disponible, sede nueva) sobre mensajes abstractos — ya evidenciado en CTR de piezas.</div>
+     <div class="owner-row"><span class="owner-tag">Triario · Growth</span></div>
+    </div>
+
+    <div class="alert sev-media">
+     <div class="alert-top"><span class="sev-chip sev-media">Media</span><span class="metric-badge">33,3% del pipeline</span></div>
+     <h4>1 de cada 3 negocios llega sin fuente de atribución</h4>
+     <p>"Fuentes sin conexión" es el grupo más grande del pipeline (1.413 de 4.248 negocios) — sin ese dato no se puede optimizar pauta con precisión.</p>
+     <div class="action">👉 <b>Acción:</b> cerrar brecha de trazabilidad con IT de COSMO (tarea de socialización con IT, abierta en ClickUp).</div>
+     <div class="owner-row"><span class="owner-tag">Triario + IT COSMO</span></div>
+    </div>
+
+    <div class="alert sev-media">
+     <div class="alert-top"><span class="sev-chip sev-media">Media</span><span class="metric-badge">ClickUp · SP128</span></div>
+     <h4>4 tareas de piezas y estrategia de pauta vencidas</h4>
+     <p>"Automatizaciones de nutrición por fases del embudo" (~20 ago), "Brief piezas matrículas 2028" (~21 ago) y 2 más siguen abiertas mientras el sprint de agosto ("Alcanzar 100% de inscripciones de agosto") está en curso.</p>
+     <div class="action">👉 <b>Acción:</b> cerrar el backlog vencido antes de abrir piezas nuevas de septiembre.</div>
+     <div class="owner-row"><span class="owner-tag">Triario · Contenido</span></div>
+    </div>
+
+    <div class="alert sev-media">
+     <div class="alert-top"><span class="sev-chip sev-media">Media</span><span class="metric-badge">2,8% → 11,6%</span></div>
+     <h4>Búsqueda orgánica pesa poco en leads, pero termina siendo la fuente que mejor convierte</h4>
+     <p>Solo genera 2,8% de los leads calientes, pero su participación crece en cada etapa hasta representar 11,6% de las matrículas pagadas — la única fuente, junto a redes de pago, que gana peso de punta a punta del embudo.</p>
+     <div class="action">👉 <b>Acción:</b> evaluar un aumento moderado de inversión en SEO/contenido; es la fuente con mejor "calidad de lead" del set.</div>
+     <div class="owner-row"><span class="owner-tag">Triario · SEO/Contenido</span></div>
+    </div>
+
+    <div class="alert sev-media">
+     <div class="alert-top"><span class="sev-chip sev-media">Media</span><span class="metric-badge">CTR 3,9–4,8%</span></div>
+     <h4>3 piezas concretas ganan, listas para replicar el formato</h4>
+     <p>En la campaña de tráfico, "Cosmo Llanogrande jornada única" (4,8% CTR), "No importa de dónde vengas" (4,7%) y "Esta fue una semana inspiradora — Itagüí" (4,6%) superan por 3 a 4 puntos el promedio de la cuenta (1,3%). Las tres anclan a algo concreto: un horario, una situación real, una sede.</p>
+     <div class="action">👉 <b>Acción:</b> usar esas 3 piezas como molde creativo para el próximo lote — evento real / dato concreto / sede — en vez de mensajes de beneficio abstracto.</div>
+     <div class="owner-row"><span class="owner-tag">Triario · Creativo</span></div>
+    </div>
+   </div>
+  </div>
+ </div>
+
+ <!-- EMBUDO -->
+ <div class="section">
+  <div class="section-head"><h2>🔻 Embudo acumulado</h2><span class="meta">En vivo · fuente: panel HubSpot (meta: OKR SharePoint)</span></div>
+  <p class="section-desc">Los ocho contadores del embudo tal como los reporta el panel de HubSpot hoy — la misma fuente que alimenta la tabla de sedes, para que ambas cuadren entre sí. La meta sigue viniendo del OKR; "Facturados" es una etapa propia de HubSpot entre Admitidos y Pago de matrícula que el OKR no separaba.</p>
+
+  <div class="funnel">
+   <div class="fr win">
+    <div class="lbl">LEADs calientes<small>Triario</small></div>
+    <div class="track"><div class="meta-mark" style="left:83%"></div><div class="real-bar" style="width:100%">13.043</div></div>
+    <div class="figures">meta <b>10.805</b></div>
+    <div class="pillpc"><span class="pill good">121%</span></div>
+   </div>
+   <div class="fr">
+    <div class="lbl">Inscripciones<small>Triario → COSMO</small></div>
+    <div class="track"><div class="meta-mark" style="left:100%"></div><div class="real-bar" style="width:92%">4.753</div></div>
+    <div class="figures">meta <b>5.169</b></div>
+    <div class="pillpc"><span class="pill warn">92%</span></div>
+   </div>
+   <div class="fr">
+    <div class="lbl">Cupos preasignados<small>COSMO</small></div>
+    <div class="track"><div class="meta-mark" style="left:100%"></div><div class="real-bar" style="width:66%">2.220</div></div>
+    <div class="figures">meta <b>3.346</b></div>
+    <div class="pillpc"><span class="pill bad">66%</span></div>
+   </div>
+   <div class="fr">
+    <div class="lbl">Pago inmersión<small>COSMO · pagada + gratis</small></div>
+    <div class="track"><div class="meta-mark" style="left:100%"></div><div class="real-bar" style="width:70%">1.442</div></div>
+    <div class="figures">meta <b>2.058</b></div>
+    <div class="pillpc"><span class="pill warn">70%</span></div>
+   </div>
+   <div class="fr win">
+    <div class="lbl">Asistencia inmersión<small>COSMO</small></div>
+    <div class="track"><div class="meta-mark" style="left:99%"></div><div class="real-bar" style="width:100%">1.467</div></div>
+    <div class="figures">meta <b>1.458</b></div>
+    <div class="pillpc"><span class="pill good">101%</span></div>
+   </div>
+   <div class="fr">
+    <div class="lbl">Admitidos<small>COSMO</small></div>
+    <div class="track"><div class="meta-mark" style="left:100%"></div><div class="real-bar" style="width:83%">1.022</div></div>
+    <div class="figures">meta <b>1.228</b></div>
+    <div class="pillpc"><span class="pill warn">83%</span></div>
+   </div>
+   <div class="fr">
+    <div class="lbl">Facturados<small>COSMO · sin meta OKR</small></div>
+    <div class="track"><div class="meta-mark" style="left:100%;opacity:.25"></div><div class="real-bar" style="width:68%">694</div></div>
+    <div class="figures">de 1.022 admitidos</div>
+    <div class="pillpc"><span class="pill warn">68%</span></div>
+   </div>
+   <div class="fr">
+    <div class="lbl">Pago matrículas<small>COSMO</small></div>
+    <div class="track"><div class="meta-mark" style="left:100%"></div><div class="real-bar" style="width:60%">389</div></div>
+    <div class="figures">meta <b>645</b></div>
+    <div class="pillpc"><span class="pill bad">60%</span></div>
+   </div>
+  </div>
+  <div class="legend">
+   <span><i style="background:var(--ink-faint)"></i>— marca = meta del período (OKR)</span>
+   <span><i style="background:linear-gradient(90deg,var(--brand),var(--violet))"></i>Resultado real (HubSpot, en vivo)</span>
+   <span><i style="background:linear-gradient(90deg,var(--good),#3ec97f)"></i>Por encima de meta</span>
+  </div>
+  <div class="note" style="margin-top:18px;padding:16px 20px;border-radius:10px;background:var(--surface-2);border-left:3px solid var(--brand);font-size:13px;color:var(--ink-muted)">Los totales de HubSpot pueden diferir un poco de los del archivo OKR porque cada tarjeta del panel trae su propia ventana de fechas y filtros — se muestran así, sin forzar el cuadre, para no maquillar la fuente más fresca con la más antigua.</div>
+ </div>
+
+ <!-- PROFUNDIDAD DE FUENTES -->
+ <div class="section">
+  <div class="section-head"><h2>🔎 Profundidad de fuentes por etapa</h2><span class="meta">En vivo · fuente: panel HubSpot</span></div>
+  <p class="section-desc">De qué fuente viene cada negocio, medido en cada etapa del embudo (no solo al entrar). Así se ve si una fuente "infla" el volumen inicial o si de verdad sostiene la calidad hasta el final.</p>
+
+  <div class="tablewrap">
+   <table>
+    <thead><tr>
+     <th>Fuente</th><th class="al-r">Leads<br><span style="font-weight:400;text-transform:none">13.043</span></th><th class="al-r">Inscripciones<br><span style="font-weight:400;text-transform:none">4.413</span></th><th class="al-r">Pago inmersión<br><span style="font-weight:400;text-transform:none">1.272</span></th><th class="al-r">Asistencia<br><span style="font-weight:400;text-transform:none">1.467</span></th><th class="al-r">Admitidos<br><span style="font-weight:400;text-transform:none">1.022</span></th><th class="al-r">Facturados<br><span style="font-weight:400;text-transform:none">694</span></th><th class="al-r">Pago matrícula<br><span style="font-weight:400;text-transform:none">389</span></th>
+    </tr></thead>
+    <tbody>
+     <tr class="hi"><td>Redes sociales de pago</td><td class="al-r num">14,5%</td><td class="al-r num">29,5%</td><td class="al-r num">25,8%</td><td class="al-r num">25,4%</td><td class="al-r num">26,6%</td><td class="al-r num">27,0%</td><td class="al-r num">24,7%</td></tr>
+     <tr><td>Fuentes sin conexión</td><td class="al-r num">70,3%</td><td class="al-r num">32,5%</td><td class="al-r num">26,3%</td><td class="al-r num">26,9%</td><td class="al-r num">24,4%</td><td class="al-r num">22,2%</td><td class="al-r num">22,1%</td></tr>
+     <tr><td>Tráfico directo</td><td class="al-r num">7,9%</td><td class="al-r num">12,1%</td><td class="al-r num">14,9%</td><td class="al-r num">15,8%</td><td class="al-r num">16,4%</td><td class="al-r num">16,6%</td><td class="al-r num">17,5%</td></tr>
+     <tr class="hi"><td>Búsqueda orgánica</td><td class="al-r num">2,8%</td><td class="al-r num">8,8%</td><td class="al-r num">11,7%</td><td class="al-r num">10,4%</td><td class="al-r num">11,0%</td><td class="al-r num">11,0%</td><td class="al-r num">11,6%</td></tr>
+     <tr><td>Otras campañas</td><td class="al-r num">1,3%</td><td class="al-r num">4,5%</td><td class="al-r num">5,5%</td><td class="al-r num">6,2%</td><td class="al-r num">5,6%</td><td class="al-r num">6,1%</td><td class="al-r num">7,2%</td></tr>
+     <tr class="lo"><td>Búsqueda de pago (Google)</td><td class="al-r num">1,6%</td><td class="al-r num">4,9%</td><td class="al-r num">5,1%</td><td class="al-r num">4,4%</td><td class="al-r num">4,0%</td><td class="al-r num">3,8%</td><td class="al-r num">2,8%</td></tr>
+     <tr><td>Tráfico orgánico RRSS</td><td class="al-r num">1,0%</td><td class="al-r num">3,6%</td><td class="al-r num">5,0%</td><td class="al-r num">4,8%</td><td class="al-r num">5,4%</td><td class="al-r num">6,2%</td><td class="al-r num">—</td></tr>
+     <tr><td>Marketing por email</td><td class="al-r num">0,3%</td><td class="al-r num">2,3%</td><td class="al-r num">2,8%</td><td class="al-r num">3,1%</td><td class="al-r num">3,4%</td><td class="al-r num">3,6%</td><td class="al-r num">4,9%</td></tr>
+     <tr><td>Referencias</td><td class="al-r num">0,2%</td><td class="al-r num">0,6%</td><td class="al-r num">0,9%</td><td class="al-r num">0,6%</td><td class="al-r num">0,8%</td><td class="al-r num">0,7%</td><td class="al-r num">0,8%</td></tr>
+    </tbody>
+   </table>
+  </div>
+
+  <div class="grid2" style="margin-top:20px">
+   <div class="card">
+    <h4 style="font-size:15px">🌱 La orgánica entra chica y sale grande</h4>
+    <p>Con 2,8% de los leads, la búsqueda orgánica llega a 11,6% de las matrículas — la fuente con mejor "calidad" del set, ganando peso en cada etapa en vez de perderlo.</p>
+   </div>
+   <div class="card">
+    <h4 style="font-size:15px">📉 Google pierde peso a cada paso</h4>
+    <p>De 1,6% en leads a apenas 2,8% en matrícula, con un pico de 5,1% que no logra sostener. Confirma, con datos de embudo completo, la alerta de arriba sobre el canal.</p>
+   </div>
+  </div>
+ </div>
+
+ <!-- SEDES -->
+ <div class="section">
+  <div class="section-head"><h2>🏫 Sedes: de cupo preasignado a matrícula</h2><span class="meta">Pipeline vivo · fuente: HubSpot</span></div>
+  <p class="section-desc">Ordenado por tasa de conversión preasignado→matrícula. No es la misma tasa del embudo global (esa mide inscripción→matrícula) — aquí se ve dónde, dentro de una misma bolsa de familias con cupo, la gestión comercial de cada sede convierte mejor o peor.</p>
+  <div class="tablewrap">
+   <table>
+    <thead><tr>
+     <th>#</th><th>Sede</th><th class="al-r">Negocios (año)</th><th class="al-r">Preasignados</th><th class="al-r">Facturados</th><th class="al-r">Pago matrícula</th><th class="al-r">Conversión</th>
+    </tr></thead>
+    <tbody>
+     <tr class="hi"><td class="rank">1</td><td>Poblado</td><td class="al-r num">179</td><td class="al-r num">76</td><td class="al-r num">27</td><td class="al-r num">18</td><td class="al-r"><span class="mini-bar"><span style="width:24%;background:var(--good)"></span></span><span class="pill good">23,7%</span></td></tr>
+     <tr class="hi"><td class="rank">2</td><td>Itagüí</td><td class="al-r num">658</td><td class="al-r num">326</td><td class="al-r num">126</td><td class="al-r num">74</td><td class="al-r"><span class="mini-bar"><span style="width:23%;background:var(--good)"></span></span><span class="pill good">22,7%</span></td></tr>
+     <tr><td class="rank">3</td><td>Rionegro</td><td class="al-r num">361</td><td class="al-r num">184</td><td class="al-r num">62</td><td class="al-r num">40</td><td class="al-r"><span class="mini-bar"><span style="width:22%;background:var(--good)"></span></span><span class="pill good">21,7%</span></td></tr>
+     <tr><td class="rank">4</td><td>Barrio Colombia</td><td class="al-r num">159</td><td class="al-r num">76</td><td class="al-r num">31</td><td class="al-r num">15</td><td class="al-r"><span class="mini-bar"><span style="width:20%"></span></span><span class="pill warn">19,7%</span></td></tr>
+     <tr><td class="rank">5</td><td>Robledo</td><td class="al-r num">467</td><td class="al-r num">275</td><td class="al-r num">93</td><td class="al-r num">51</td><td class="al-r"><span class="mini-bar"><span style="width:19%"></span></span><span class="pill warn">18,5%</span></td></tr>
+     <tr><td class="rank">6</td><td>Laureles</td><td class="al-r num">439</td><td class="al-r num">248</td><td class="al-r num">69</td><td class="al-r num">43</td><td class="al-r"><span class="mini-bar"><span style="width:17%"></span></span><span class="pill warn">17,3%</span></td></tr>
+     <tr><td class="rank">7</td><td>Bello</td><td class="al-r num">782</td><td class="al-r num">306</td><td class="al-r num">84</td><td class="al-r num">52</td><td class="al-r"><span class="mini-bar"><span style="width:17%"></span></span><span class="pill warn">17,0%</span></td></tr>
+     <tr><td class="rank">8</td><td>Envigado</td><td class="al-r num">466</td><td class="al-r num">293</td><td class="al-r num">86</td><td class="al-r num">47</td><td class="al-r"><span class="mini-bar"><span style="width:16%"></span></span><span class="pill warn">16,0%</span></td></tr>
+     <tr><td class="rank">9</td><td>Cristo Rey</td><td class="al-r num">216</td><td class="al-r num">120</td><td class="al-r num">33</td><td class="al-r num">18</td><td class="al-r"><span class="mini-bar"><span style="width:15%"></span></span><span class="pill warn">15,0%</span></td></tr>
+     <tr class="lo"><td class="rank">10</td><td>Centro</td><td class="al-r num">447</td><td class="al-r num">276</td><td class="al-r num">73</td><td class="al-r num">28</td><td class="al-r"><span class="mini-bar"><span style="width:10%;background:var(--bad)"></span></span><span class="pill bad">10,1%</span></td></tr>
+     <tr class="lo"><td class="rank">11</td><td>Llanogrande</td><td class="al-r num">74</td><td class="al-r num">40</td><td class="al-r num">10</td><td class="al-r num">3</td><td class="al-r"><span class="mini-bar"><span style="width:8%;background:var(--bad)"></span></span><span class="pill bad">7,5%</span></td></tr>
+    </tbody>
+   </table>
+  </div>
+ </div>
+
+ <!-- PAUTA -->
+ <div class="section">
+  <div class="section-head"><h2>🎯 Pauta digital</h2><span class="meta">Mes pasado · fuente: HubSpot Ads (cuenta Meta)</span></div>
+  <p class="section-desc">La vista de Ads filtrada muestra la cuenta de Meta. Google no aparece con campañas activas en este corte — el comparativo de leads calientes por canal sí viene del OKR y cubre ambos.</p>
+  <div class="pauta-grid">
+   <div class="cmp-card">
+    <h4 style="font-size:14.5px">Leads calientes por canal de pauta · acumulado abr–ago</h4>
+    <div class="cmp-row">
+     <div class="who" style="color:#4285F4">Google</div>
+     <div class="cmp-track"><div class="cmp-fill g" style="width:10%"></div></div>
+     <div class="cmp-figs"><b>185</b> / 1.891</div>
+    </div>
+    <div class="cmp-row">
+     <div class="who" style="color:var(--violet-ink)">Meta</div>
+     <div class="cmp-track"><div class="cmp-fill m" style="width:100%"></div></div>
+     <div class="cmp-figs"><b>1.732</b> / 810</div>
+    </div>
+    <p style="font-size:12.5px;color:var(--ink-muted);margin-top:16px">Google entrega 10% de su meta; Meta entrega 214% de la suya. Toda la sobredemanda del período viene de un solo canal.</p>
+   </div>
+   <div class="cmp-card">
+    <h4 style="font-size:14.5px">Cuenta Meta — mes pasado</h4>
+    <div class="cmp-row" style="grid-template-columns:1fr 1fr">
+     <div><div class="cmp-figs" style="text-align:left;font-size:11px">Invertido</div><div class="n" style="font-size:20px;margin-top:2px">$5,8M<small style="font-size:11px"> COP</small></div></div>
+     <div><div class="cmp-figs" style="text-align:left;font-size:11px">Contactos</div><div class="n" style="font-size:20px;margin-top:2px">585</div></div>
+    </div>
+    <div class="cmp-row" style="grid-template-columns:1fr 1fr;margin-top:12px">
+     <div><div class="cmp-figs" style="text-align:left;font-size:11px">CTR cuenta</div><div class="n" style="font-size:20px;margin-top:2px">1,3%</div></div>
+     <div><div class="cmp-figs" style="text-align:left;font-size:11px">Costo / contacto</div><div class="n" style="font-size:20px;margin-top:2px">~$9,9K</div></div>
+    </div>
+   </div>
+  </div>
+
+  <div class="tablewrap" style="margin-top:18px">
+   <table>
+    <thead><tr><th>Campaña</th><th>Objetivo</th><th class="al-r">Impresiones</th><th class="al-r">Clics</th><th class="al-r">CTR</th><th class="al-r">Contactos</th><th class="al-r">Invertido</th><th>Estado</th></tr></thead>
+    <tbody>
+     <tr><td>Tri - Conversión - Matrículas LeadAds</td><td>Leads</td><td class="al-r num">305.957</td><td class="al-r num">4.123</td><td class="al-r num">1,3%</td><td class="al-r num">417</td><td class="al-r num">$2,43M</td><td><span class="pill good">OK</span></td></tr>
+     <tr><td>Tri - Whatsapp - Matrículas e inmersión</td><td>Leads</td><td class="al-r num">322.046</td><td class="al-r num">2.974</td><td class="al-r num">0,9%</td><td class="al-r num">0*</td><td class="al-r num">$1,75M</td><td><span class="pill warn">*conversión off-platform</span></td></tr>
+     <tr><td>Tri - LeadAds - Matrículas Remarketing</td><td>Leads</td><td class="al-r num">194.144</td><td class="al-r num">1.322</td><td class="al-r num">0,7%</td><td class="al-r num">156</td><td class="al-r num">$1,04M</td><td><span class="pill good">OK</span></td></tr>
+     <tr class="lo"><td>Tri - Tráfico - Publicaciones destacadas</td><td>Tráfico</td><td class="al-r num">51.425</td><td class="al-r num">3.247</td><td class="al-r num">6,3%</td><td class="al-r num">0</td><td class="al-r num">$0,31M</td><td><span class="pill bad">Error tracking</span></td></tr>
+     <tr><td>Tri - Conversión - Webinar On Demand</td><td>Leads</td><td class="al-r num">28.687</td><td class="al-r num">463</td><td class="al-r num">1,6%</td><td class="al-r num">12</td><td class="al-r num">$0,27M</td><td><span class="pill good">OK</span></td></tr>
+    </tbody>
+   </table>
+  </div>
+
+  <div class="section-head" style="margin-top:36px"><h2 style="font-size:17px">🏆 Qué piezas funcionan mejor</h2><span class="meta">Mes pasado · nivel anuncio y página</span></div>
+  <p class="section-desc">La campaña de tráfico ("Publicaciones destacadas", CTR 6,3% de cuenta) desglosada por anuncio, más las páginas que más visitas reciben este mes en el sitio de COSMO — pauta y orgánico juntos.</p>
+  <div class="pauta-grid">
+   <div class="cmp-card">
+    <h4 style="font-size:14.5px">Anuncios — campaña "Publicaciones destacadas"</h4>
+    <div class="cmp-row" style="grid-template-columns:1fr auto;margin-top:14px">
+     <div class="who" style="font-weight:700">🥇 Cosmo Llanogrande es jornada única</div><div class="cmp-figs"><b>4,8%</b> CTR</div>
+    </div>
+    <p style="font-size:12px;color:var(--ink-faint);margin-top:-6px">786 impr. · 38 clics · $4.038 COP — ancla a un cambio de horario real</p>
+    <div class="cmp-row" style="grid-template-columns:1fr auto">
+     <div class="who" style="font-weight:700">🥈 No importa de dónde vengas</div><div class="cmp-figs"><b>4,7%</b> CTR</div>
+    </div>
+    <p style="font-size:12px;color:var(--ink-faint);margin-top:-6px">7.046 impr. · 330 clics · $30.539 COP — mayor alcance del grupo</p>
+    <div class="cmp-row" style="grid-template-columns:1fr auto">
+     <div class="who" style="font-weight:700">🥉 Esta fue una semana inspiradora (Itagüí)</div><div class="cmp-figs"><b>4,6%</b> CTR</div>
+    </div>
+    <p style="font-size:12px;color:var(--ink-faint);margin-top:-6px">7.867 impr. · 364 clics · $27.734 COP — comunidad y alianzas locales</p>
+    <div class="cmp-row" style="grid-template-columns:1fr auto">
+     <div class="who">Sabías que resolver un cubo de Rubik</div><div class="cmp-figs">3,9% CTR</div>
+    </div>
+    <p style="font-size:12px;color:var(--ink-faint);margin-top:-6px">1.771 impr. · 69 clics · $9.055 COP — la más floja del lote, mismo formato</p>
+   </div>
+   <div class="cmp-card">
+    <h4 style="font-size:14.5px">Páginas más vistas — este mes</h4>
+    <div class="cmp-row" style="grid-template-columns:1fr auto;margin-top:14px"><div class="who">cosmo.edu.co/ (home)</div><div class="cmp-figs"><b>6.683</b></div></div>
+    <div class="cmp-row" style="grid-template-columns:1fr auto"><div class="who">/admisiones/becas</div><div class="cmp-figs"><b>2.487</b></div></div>
+    <div class="cmp-row" style="grid-template-columns:1fr auto"><div class="who">PP "Educar para un mundo que cambió"</div><div class="cmp-figs"><b>2.072</b></div></div>
+    <div class="cmp-row" style="grid-template-columns:1fr auto"><div class="who">Webinar on demand</div><div class="cmp-figs"><b>1.769</b></div></div>
+    <div class="cmp-row" style="grid-template-columns:1fr auto"><div class="who">/admisiones</div><div class="cmp-figs"><b>1.399</b></div></div>
+    <p style="font-size:12.5px;color:var(--ink-muted);margin-top:16px">Becas es la segunda página más visitada del sitio — señal de sensibilidad al precio que vale la pena reforzar en el guion comercial, no solo en la web.</p>
+   </div>
+  </div>
+ </div>
+
+ <!-- ACCIONES -->
+ <div class="section">
+  <div class="section-head"><h2>🗂️ En curso ahora</h2><span class="meta">Fuente: ClickUp · lista COSMO</span></div>
+  <p class="section-desc">Sprint activo: <b>SP 128 — alcanzar 100% de inscripciones de matrículas 2027 de agosto</b> (cierra 31 ago). Se muestran las tareas atrasadas por resolver antes de abrir el próximo sprint y lo que sigue por hacer esta semana.</p>
+  <div class="actions-grid">
+   <div>
+    <div class="lane-title" style="margin-bottom:12px"><span class="sw" style="background:var(--bad)"></span>Atrasadas</div>
+    <div class="task-list">
+     <div class="task"><div><div class="task-name">Implementación agente de gestión comercial</div><div class="task-meta">Comercial COSMO · vencida desde mediados de junio</div></div><span class="task-status atrasada">Atrasada</span></div>
+     <div class="task"><div><div class="task-name">Informe de resultados julio</div><div class="task-meta">María de Jesús Hernández · vencida desde inicios de agosto</div></div><span class="task-status atrasada">Atrasada</span></div>
+     <div class="task"><div><div class="task-name">Automatizaciones de nutrición y conversión por fases del embudo</div><div class="task-meta">Pamela Gómez · vencida hace ~1 semana</div></div><span class="task-status atrasada">Atrasada</span></div>
+     <div class="task"><div><div class="task-name">Brief de creación de piezas matrículas 2028</div><div class="task-meta">María de Jesús Hernández · vencida hace ~1 semana</div></div><span class="task-status atrasada">Atrasada</span></div>
+     <div class="task"><div><div class="task-name">Revisión data año completo matrícula 2027</div><div class="task-meta">María de Jesús Hernández · vencida desde inicios de agosto</div></div><span class="task-status atrasada">Atrasada</span></div>
+    </div>
+   </div>
+   <div>
+    <div class="lane-title" style="margin-bottom:12px"><span class="sw" style="background:var(--gold)"></span>En proceso / esta semana</div>
+    <div class="task-list">
+     <div class="task"><div><div class="task-name">SP 128 — Alcanzar 100% de inscripciones de matrículas 2027 de agosto</div><div class="task-meta">María de Jesús Hernández · vence 31 ago</div></div><span class="task-status enproceso">En proceso</span></div>
+     <div class="task"><div><div class="task-name">HU: Inbound marketing COSMO — objetivo de matrículas</div><div class="task-meta">Equipo completo · vence 31 ago</div></div><span class="task-status enproceso">En proceso</span></div>
+     <div class="task"><div><div class="task-name">Encendida de todos los activos</div><div class="task-meta">Pamela Gómez · Santiago Chaux</div></div><span class="task-status porhacer">Por hacer</span></div>
+     <div class="task"><div><div class="task-name">Pauta digital — urgente</div><div class="task-meta">Sin asignar</div></div><span class="task-status porhacer">Por hacer</span></div>
+     <div class="task"><div><div class="task-name">Dashboard MKT y Sales</div><div class="task-meta">Ya en el backlog de ClickUp — este panel lo resuelve</div></div><span class="task-status atrasada">Atrasada</span></div>
+    </div>
+   </div>
+  </div>
+ </div>
+
+ <footer>
+  <div class="foot-grid">
+   <div>
+    <div class="foot-brand">
+     <img class="dark-only-invert" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTE1IiBoZWlnaHQ9IjMzIiB2aWV3Qm94PSIwIDAgMTE1IDMzIiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8ZyBjbGlwLXBhdGg9InVybCgjY2xpcDBfMTg0MF8yMTI0KSI+CjxwYXRoIGQ9Ik0zNy44NjQzIDMzQzM3LjA5MzYgMzMgMzYuMzIyOSAzMi44NjY0IDM1LjU2NCAzMi41NTJDMzIuNzE0MyAzMS4zNzY5IDMxLjI2NzcgMjguMjM2OSAzMS4yNjc3IDIzLjIzMDFDMzEuMjY3NyAyMC4zNzY5IDMxLjI3NTYgMTcuOTU2MSAzMS4yODM1IDE1LjMzNDhDMzEuMjg3NSAxMy4zNzM3IDMxLjI5MTQgMTEuODU2NyAzMS4yOTE0IDEwLjY1NDJIMzcuNjE1M0MzNy42MTUzIDExLjg2MDcgMzcuNjExNCAxMy4zODE2IDM3LjYwNzQgMTUuMzUwNUMzNy41OTk1IDE3Ljk2NzggMzcuNTkxNiAyMC4zODA5IDM3LjU5MTYgMjMuMjMwMUMzNy41OTE2IDI2LjA3OTMgMzguNjQyOSAyNi45MDg1IDM4LjY0MjkgMjYuOTA4NUM0MC40MDk3IDI2LjQ3NjIgNDEuMjM5NyAyNS4zMzI2IDQyLjE1MjcgMjQuMDEyMUw0Ni42MTEgMjguNDY4N0M0NS40MDk1IDI5LjY2MzUgNDEuNjkwMyAzMyAzNy44NjA0IDMzSDM3Ljg2NDNaIiBmaWxsPSIjRUYyMjIyIi8+CjxwYXRoIGQ9Ik04OC44Mzg5IDMzQzg4LjA2ODEgMzMgODcuMjk3NCAzMi44NjY0IDg2LjUzODUgMzIuNTUyQzgzLjY4ODggMzEuMzc2OSA4Mi4yNDIyIDI4LjIzNjkgODIuMjQyMiAyMy4yMzAxQzgyLjI0MjIgMjAuMzc2OSA4Mi4yNTAyIDE4LjAxODkgODIuMjU4MSAxNS40NTY2QzgyLjI2MiAxMy41Mzg4IDgyLjI2NiAxMS44NTY3IDgyLjI2NiAxMC42NTQySDg4LjU4OTlDODguNTg5OSAxMS44NjA3IDg4LjU4NTkgMTMuNTQ2NiA4OC41ODE5IDE1LjQ3MjNDODguNTc0IDE4LjAzMDcgODguNTY2MSAyMC4zODA5IDg4LjU2NjEgMjMuMjMwMUM4OC41NjYxIDI1LjM3OTggODguODgyMyAyNi4zMzQ4IDg5LjA1MjMgMjYuNjg4NUM4OS45MzM3IDI2LjUxOTUgOTEuODIyOSAyNS4yOTMzIDkzLjEzMTIgMjQuMDA4Mkw5Ny41ODk2IDI4LjQ2NDhDOTYuMzg4IDI5LjY1OTUgOTIuNjY4OCAzMi45OTYxIDg4LjgzODkgMzIuOTk2MVYzM1oiIGZpbGw9IiNFRjIyMjIiLz4KPHBhdGggZD0iTTY3LjEwNDQgMzNDNjMuNzk2MiAzMyA1OC44NzU1IDMwLjU2NzMgNTguODc1NSAyMy44NjY3QzU4Ljg3NTUgMjEuMDEzNiA1OC44ODM0IDE4LjI5MDEgNTguODkxMyAxNS45NTU3QzU4Ljg5NTIgMTQuMjA2OSA1OC44OTkyIDExLjg2MDcgNTguODk5MiAxMC42NTQySDY1LjIyMzFDNjUuMjIzMSAxMS44NjA3IDY1LjIxOTEgMTQuMjE4NyA2NS4yMTUyIDE1Ljk3MTRDNjUuMjA3MyAxOC4zMDE5IDY1LjE5OTQgMjEuMDE3NSA2NS4xOTk0IDIzLjg2NjdDNjUuMTk5NCAyNC41NDY2IDY1LjE5OTQgMjYuNjEzOCA2Ny4xNzU2IDI2LjcxNkg2Ny4xMDQ0VjMzLjAwMzlWMzNaIiBmaWxsPSIjRUYyMjIyIi8+CjxwYXRoIGQ9Ik0zNC4zOTggMEMzNi43Nzc0IDAgMzcuOTkwOCAxLjM5OTA3IDM3Ljk5MDggMy41NzIzNUMzNy45OTA4IDUuODk4ODkgMzYuMzkgNy4xNDQ2OSAzNC4zOTggNy4xNDQ2OUMzMi43MDY0IDcuMTQ0NjkgMzEuMDQ2NCA1LjUzMzQgMzEuMDQ2NCAzLjU3MjM1QzMxLjA0NjQgMS42MTEyOSAzMi4zNzgzIDAgMzQuMzk4IDBaIiBmaWxsPSIjRUYyMjIyIi8+CjxwYXRoIGQ9Ik04NS4yODU2IDBDODcuNjY1IDAgODguODc4NCAxLjM5OTA3IDg4Ljg3ODQgMy41NzIzNUM4OC44Nzg0IDUuODk4ODkgODcuMjc3NiA3LjE0NDY5IDg1LjI4NTYgNy4xNDQ2OUM4My41OTQgNy4xNDQ2OSA4MS45MzQgNS41MzM0IDgxLjkzNCAzLjU3MjM1QzgxLjkzNCAxLjYxMTI5IDgzLjI2NTkgMCA4NS4yODU2IDBaIiBmaWxsPSIjRUYyMjIyIi8+CjxwYXRoIGQ9Ik0yOS42MDc3IDEwLjEwNEMyNy40MTAxIDEwLjEwNCAyNS4yMDQ3IDEwLjc4NzggMjMuMzE5NCAxMi4xMlYxMC42NTAySDE4LjE2OTNWMzIuNDQ5OEgyMy41OTZWMjMuNTU2M0MyMy41OTYgMTcuODMwMyAyNC44NTI5IDE1LjYxMzggMjkuNjA3NyAxNS42MTM4VjEwLjEwNFoiIGZpbGw9IiNFRjIyMjIiLz4KPHBhdGggZD0iTTgwLjU4MjIgMTAuMTA0Qzc4LjM4NDcgMTAuMTA0IDc2LjE3OTIgMTAuNzg3OCA3NC4yOTM5IDEyLjEyVjEwLjY1MDJINjkuMTQzOVYzMi40NDk4SDc0LjU3MDVWMjMuNTU2M0M3NC41NzA1IDE3LjgzMDMgNzUuODI3NCAxNS42MTM4IDgwLjU4MjIgMTUuNjEzOFYxMC4xMDRaIiBmaWxsPSIjRUYyMjIyIi8+CjxwYXRoIGQ9Ik0xMi43ODYxIDIzLjE1MTVWMTUuNDM2OUMxMi43ODYxIDEyLjEyIDEzLjk0MDIgMTAuNjU0MiAxNi40NjU4IDEwLjY1NDJMMTYuNTAxNCA0Ljg4ODg5SDEyLjYyMDFDMTIuNjIwMSA0Ljg4ODg5IDEzLjUzNzEgMS41MDUxOCAxMy41MzcxIDBINy4zMTJDNy4xNzc2MiAzLjQ2NjI0IDYuMjg0MzcgOS4zMTQwNCAwIDEwLjY0NjNMMS4yNTI5MiAxNi41MTM4QzMuMzYzNTIgMTYuMDY1NyA1LjEwMjU5IDE1LjMzODcgNi41MzczMyAxNC40NDY2VjIzLjUyNDhDNi41MzczMyAyOS41MDIzIDEwLjMyMzggMzMuMDAzOSAxNS45OTE1IDMzLjAwMzlWMjcuMDg1NEMxMy42NzU0IDI3LjA4NTQgMTIuNzgyMiAyNi4yMjA4IDEyLjc4MjIgMjMuMTU1NEwxMi43ODYxIDIzLjE1MTVaIiBmaWxsPSJ1cmwoI3BhaW50MF9saW5lYXJfMTg0MF8yMTI0KSIvPgo8cGF0aCBkPSJNNTMuMDkzIDEwLjEwNEM1OS44Njc1IDEwLjEwNCA2NC43ODQzIDE0Ljc3MjggNjQuNzg0MyAyMS41NTJDNjQuNzg0MyAyOC4zMzEyIDU5Ljg2NzUgMzMgNTMuMDkzIDMzQzQ2LjMxODYgMzMgNDEuNDAxNyAyOC4zMzEyIDQxLjQwMTcgMjEuNTUyQzQxLjQwMTcgMTQuNzcyOCA0Ni4zMTg2IDEwLjEwNCA1My4wOTMgMTAuMTA0Wk01My4wOTMgMjcuNjcxQzU2LjUxNTggMjcuNjcxIDU4Ljg3OTQgMjUuMTk5IDU4Ljg3OTQgMjEuNTU1OUM1OC44Nzk0IDE3LjkxMjggNTYuNTE1OCAxNS40NDA5IDUzLjA5MyAxNS40NDA5QzQ5LjY3MDIgMTUuNDQwOSA0Ny4zMDY3IDE3LjkxMjggNDcuMzA2NyAyMS41NTU5QzQ3LjMwNjcgMjUuMTk5IDQ5LjY3MDIgMjcuNjcxIDUzLjA5MyAyNy42NzFaIiBmaWxsPSIjRUYyMjIyIi8+CjxwYXRoIGQ9Ik0xMDMuMzA5IDEwLjEwNEMxMTAuMDgzIDEwLjEwNCAxMTQuOTk2IDE0Ljc3MjggMTE0Ljk5NiAyMS41NTJDMTE0Ljk5NiAyOC4zMzEyIDExMC4wODMgMzMgMTAzLjMwOSAzM0M5Ni41MzQyIDMzIDkxLjYyMTQgMjguMzMxMiA5MS42MjE0IDIxLjU1MkM5MS42MjE0IDE0Ljc3MjggOTYuNTM0MiAxMC4xMDQgMTAzLjMwOSAxMC4xMDRaTTEwMy4zMDkgMjcuNjcxQzEwNi43MzIgMjcuNjcxIDEwOS4wOTEgMjUuMTk5IDEwOS4wOTEgMjEuNTU1OUMxMDkuMDkxIDE3LjkxMjggMTA2LjcyOCAxNS40NDA5IDEwMy4zMDkgMTUuNDQwOUM5OS44ODk5IDE1LjQ0MDkgOTcuNTI2MyAxNy45MTI4IDk3LjUyNjMgMjEuNTU1OUM5Ny41MjYzIDI1LjE5OSA5OS44ODk5IDI3LjY3MSAxMDMuMzA5IDI3LjY3MVoiIGZpbGw9IiNFRjIyMjIiLz4KPHBhdGggZD0iTTEzLjUzNzEgMEg3LjMxMkM3LjE3NzYyIDMuNDY2MjQgNi4yODQzNyA5LjMxNDA0IDAgMTAuNjQ2M0wxLjI1MjkyIDE2LjUxMzhDMy4zNjM1MiAxNi4wNjU3IDUuMTAyNTkgMTUuMzM4NyA2LjUzNzMyIDE0LjQ0NjZDNi41MzczMiAxNC40NDY2IDEzLjUzMzEgMTAuMjE3OSAxMy41MjUyIDEuOTg4NTdDMTMuNTI1MiAxLjk4ODU3IDEzLjUzMzEgMS41MTMwNCAxMy41MzMxIDAuMDAzOTI5OTdMMTMuNTM3MSAwWiIgZmlsbD0iI0VGMjIyMiIvPgo8L2c+CjxkZWZzPgo8bGluZWFyR3JhZGllbnQgaWQ9InBhaW50MF9saW5lYXJfMTg0MF8yMTI0IiB4MT0iMTMuNjM1OSIgeTE9IjE0LjM0NDQiIHgyPSItMy4zMTk1OCIgeTI9Ii0yLjU5ODMyIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+CjxzdG9wIHN0b3AtY29sb3I9IiNFRjIyMjIiLz4KPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMzYxMTMzIi8+CjwvbGluZWFyR3JhZGllbnQ+CjxjbGlwUGF0aCBpZD0iY2xpcDBfMTg0MF8yMTI0Ij4KPHJlY3Qgd2lkdGg9IjExNSIgaGVpZ2h0PSIzMyIgZmlsbD0id2hpdGUiLz4KPC9jbGlwUGF0aD4KPC9kZWZzPgo8L3N2Zz4K" alt="Triario">
+    </div>
+    <p>Panel operativo COSMO Schools × Triario. Cruza OKR 2026 (SharePoint), pipeline de HubSpot y plan de trabajo de ClickUp para dar seguimiento diario a inscripciones y conversión a matrícula.</p>
+   </div>
+   <div>
+    <h5>Cómo se actualiza</h5>
+    <ul>
+     <li>Corte de datos: 25 ago 2026</li>
+     <li>OKR y ClickUp: pueden refrescarse sin depender de sesión</li>
+     <li>HubSpot: requiere sesión activa para refrescar</li>
+     <li>Pide "actualiza el panel" para regenerar este corte</li>
+    </ul>
+   </div>
+   <div>
+    <h5>Fuentes</h5>
+    <ul>
+     <li><a href="https://triario1-my.sharepoint.com/:x:/r/personal/maria_hernandez_triario_com/_layouts/15/Doc.aspx?sourcedoc=%7BEC768B31-4686-4AEF-A1FF-DC20D82EFBD7%7D&file=COSMO%20-%20OKR%202026%20(ago2026).xlsx" target="_blank" rel="noopener">OKR 2026.xlsx</a></li>
+     <li><a href="https://app.hubspot.com/reports-dashboard/23912833/view/19814122" target="_blank" rel="noopener">Panel HubSpot — resultados generales</a></li>
+     <li><a href="https://app.hubspot.com/ads/23912833/" target="_blank" rel="noopener">HubSpot Ads</a></li>
+     <li><a href="https://app.clickup.com/3025127/v/li/901712322104" target="_blank" rel="noopener">Lista COSMO en ClickUp</a></li>
+    </ul>
+   </div>
+  </div>
+ </footer>
+</div>
+
+<script>
+(function(){
+  var bars = document.querySelectorAll('.real-bar, .barfill, .cmp-fill');
+  var targets = [];
+  bars.forEach(function(el){ targets.push(el.style.width); el.style.width='0%'; });
+  requestAnimationFrame(function(){
+    setTimeout(function(){
+      bars.forEach(function(el,i){ el.style.width = targets[i]; });
+    }, 80);
+  });
+})();
+</script>
+
+</body>
+</html>
